@@ -8,6 +8,7 @@ export class ScheduleDto {
 
 export class GroupDto {
   subjectGroupId: number;
+  spots: number;
   group: string;
   teacher: string;
   schedules: ScheduleDto[];

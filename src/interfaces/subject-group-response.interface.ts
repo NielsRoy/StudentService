@@ -2,6 +2,7 @@ export class SubjectGroupResponse {
   planSubjectId: number;
   groups: {
     subjectGroupId: number;
+    spots: number;
     group: string;
     teacher: string;
     schedules: {
