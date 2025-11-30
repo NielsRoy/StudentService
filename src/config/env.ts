@@ -6,6 +6,8 @@ interface EnvVars {
   STATE: 'production' | 'development';
   PORT: number;
 
+  JWT_SECRET: string;
+
   DB_PASSWORD: string;
   DB_NAME: string;
   DB_HOST: string;
@@ -17,13 +19,13 @@ interface EnvVars {
 
   KAFKA_HOST: string;
   KAFKA_PORT: number;
-  REDIS_HOST: string;
-  REDIS_PORT: number;
 }
 
 const envsSchema = joi.object({
   STATE: joi.allow('production','development').required(),
   PORT: joi.number().required(),
+
+  JWT_SECRET: joi.string().required(),
 
   DB_PASSWORD: joi.string().required(),
   DB_NAME: joi.string().required(),
@@ -36,9 +38,6 @@ const envsSchema = joi.object({
 
   KAFKA_HOST: joi.string().required(),
   KAFKA_PORT: joi.number().required(),
-  
-  REDIS_HOST: joi.string().required(),
-  REDIS_PORT: joi.number().required(),
 })
 .unknown(true);
 
@@ -52,19 +51,20 @@ const envVars:EnvVars = value;
 
 
 export const envs = {
-  state: envVars.STATE,
-  port: envVars.PORT,
-  dbPassword: envVars.DB_PASSWORD,
-  dbName: envVars.DB_NAME,
-  dbHost: envVars.DB_HOST,
-  dbPort: envVars.DB_PORT,
-  dbUsername: envVars.DB_USERNAME,
+  STATE: envVars.STATE,
+  PORT: envVars.PORT,
 
-  natsHost: envVars.NATS_HOST,
-  natsPort: envVars.NATS_PORT,
+  JWT_SECRET: envVars.JWT_SECRET,
 
-  kafkaHost: envVars.KAFKA_HOST,
-  kafkaPort: envVars.KAFKA_PORT,
-  redisHost: envVars.REDIS_HOST,
-  redisPort: envVars.REDIS_PORT,
+  DB_PASSWORD: envVars.DB_PASSWORD,
+  DB_NAME: envVars.DB_NAME,
+  DB_HOST: envVars.DB_HOST,
+  DB_PORT: envVars.DB_PORT,
+  DB_USERNAME: envVars.DB_USERNAME,
+
+  NATS_HOST: envVars.NATS_HOST,
+  NATS_PORT: envVars.NATS_PORT,
+
+  KAFKA_HOST: envVars.KAFKA_HOST,
+  KAFKA_PORT: envVars.KAFKA_PORT,
 };

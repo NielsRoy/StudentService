@@ -14,7 +14,7 @@ export class GroupDto {
   schedules: ScheduleDto[];
 }
 
-export class SubjectForEnrollDto {
+export class SubjectToEnrollDto {
   planSubjectId: number;
   code: string;
   name: string;

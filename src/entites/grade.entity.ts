@@ -13,5 +13,8 @@ export class Grade {
   date: Date;
 
   @Column()
-  registrationDetailId: number;
+  studentId: number;
+
+  @Column()
+  enrollmentDetailId: number;
 }

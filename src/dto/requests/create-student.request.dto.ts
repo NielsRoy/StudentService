@@ -6,6 +6,10 @@ export class CreateStudentRequestDto {
   // @Min(0)
   code: number;
 
+  // @IsString()
+  // @MinLength(6)
+  password: string;
+
   // @IsNumber()
   // @Min(0)
   ci: number;

@@ -1,44 +1,50 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { envs } from './config/env';
-import { AcademicAdvance } from './entites/academic-advance.entity';
 import { Grade } from './entites/grade.entity';
 import { Student } from './entites/student.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NATS_SERVICE, SCHEDULE_SERVICE, STUDY_PLAN_SERVICE } from './config/services';
-import { PrerequisiteCountView } from './entites/prerequisite-count-view.entity';
+import { NATS_SERVICE } from './config/services';
+import { CommonModule } from './common/common.module';
+import { AuthService } from './services/auth.service';
+import { StudentService } from './services/student.service';
+import { JwtModule } from '@nestjs/jwt';
+import { GradeService } from './services/grade.service';
 
 @Module({
   imports: [
+    JwtModule.register({
+      secret: envs.JWT_SECRET,
+      signOptions: {
+        expiresIn: '5h'
+      },
+    }),
     TypeOrmModule.forRoot({
-      ssl: envs.state === 'production',
+      ssl: envs.STATE === 'production',
       extra: {
-        ssl: envs.state === 'production'
-        ? { rejectUnauthorized: false }
-        : false
+        ssl: envs.STATE === 'production'
+          ? { rejectUnauthorized: false }
+          : false
       },
       type: 'postgres',
-      host: envs.dbHost,
-      port: envs.dbPort,
-      username: envs.dbUsername,
-      password: envs.dbPassword,
-      database: envs.dbName,
+      host: envs.DB_HOST,
+      port: envs.DB_PORT,
+      username: envs.DB_USERNAME,
+      password: envs.DB_PASSWORD,
+      database: envs.DB_NAME,
       autoLoadEntities: true,
     }),
     TypeOrmModule.forFeature([
-      AcademicAdvance,
       Grade,
       Student,
-      PrerequisiteCountView,
     ]),
     ClientsModule.register([
-      { 
+      {
         name: NATS_SERVICE,
         transport: Transport.NATS,
         options: {
-          servers: [`nats://${envs.natsHost}:${envs.natsPort}`],
+          servers: [`nats://${envs.NATS_HOST}:${envs.NATS_PORT}`],
         }
       },
       // { 
@@ -51,8 +57,9 @@ import { PrerequisiteCountView } from './entites/prerequisite-count-view.entity'
       //   },
       // },
     ]),
+    CommonModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AuthService, StudentService, GradeService],
 })
-export class AppModule {}
+export class AppModule { }

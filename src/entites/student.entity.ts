@@ -11,6 +11,9 @@ export class Student {
   })
   code: number;
 
+  @Column({ select: false })
+  password: string;
+
   @Column({
     unique: true,
   })

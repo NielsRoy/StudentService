@@ -1,0 +1,1 @@
+export const HASH_SERVICE = 'HASH_SERVICE';
