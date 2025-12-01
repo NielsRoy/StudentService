@@ -36,9 +36,14 @@ export class StudentService {
     }
 
     // Step 2: Get all plan subjects for the student's study plan via NATS
-    const allPlanSubjects = await firstValueFrom(
-      this.natsClient.send('get_plan_subjects_by_study_plan_id', { studyPlanId: student.studyPlanId })
-    );
+    let allPlanSubjects;
+    try {
+      allPlanSubjects = await firstValueFrom(
+        this.natsClient.send('get_plan_subjects_by_study_plan_id', { studyPlanId: student.studyPlanId })
+      );
+    } catch (error) {
+      throw new Error(`Failed to fetch plan subjects: ${error.message}`);
+    }
 
     if (!allPlanSubjects || allPlanSubjects.length === 0) {
       return [];
@@ -60,9 +65,14 @@ export class StudentService {
     const unapprovedPlanSubjectIds = unapprovedPlanSubjects.map(ps => ps.planSubjectId);
 
     // Step 5: Get prerequisites for the unapproved subjects via NATS
-    const prerequisites = await firstValueFrom(
-      this.natsClient.send('get_prerequisites_by_plan_subject_ids', unapprovedPlanSubjectIds)
-    );
+    let prerequisites;
+    try {
+      prerequisites = await firstValueFrom(
+        this.natsClient.send('get_prerequisites_by_plan_subject_ids', unapprovedPlanSubjectIds)
+      );
+    } catch (error) {
+      throw new Error(`Failed to fetch prerequisites: ${error.message}`);
+    }
 
     // Step 6: Get student's passed prerequisites
     const passedPrerequisiteIds = await this.gradeService.getPassedPrerequisiteIds(studentId);
@@ -91,9 +101,14 @@ export class StudentService {
     }
 
     // Step 9: Get subject groups with schedules via NATS
-    const subjectGroupsData = await firstValueFrom(
-      this.natsClient.send('get_subject_groups_by_plan_subject_ids', eligiblePlanSubjectIds)
-    );
+    let subjectGroupsData;
+    try {
+      subjectGroupsData = await firstValueFrom(
+        this.natsClient.send('get_subject_groups_by_plan_subject_ids', eligiblePlanSubjectIds)
+      );
+    } catch (error) {
+      throw new Error(`Failed to fetch subject groups: ${error.message}`);
+    }
 
     // Step 10: Build a map of planSubjectId -> groups
     const groupsMap = new Map<number, GroupDto[]>();
