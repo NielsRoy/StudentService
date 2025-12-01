@@ -19,10 +19,6 @@ export class StudentService {
     private readonly gradeService: GradeService,
   ) { }
 
-  async check(studentId: number) {
-    return { message: `StudentService obtuvo: studentId = ${studentId}` }
-  }
-
   /**
    * Get subjects that a student can enroll in based on their study plan,
    * prerequisites, and academic history

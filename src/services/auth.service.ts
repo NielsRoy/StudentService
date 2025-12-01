@@ -22,7 +22,7 @@ export class AuthService {
 
     @InjectRepository(Student)
     private readonly studentRepository: Repository<Student>,
-  ) {}
+  ) { }
 
   async registerStudent(dto: CreateStudentRequestDto): Promise<AuthResponseDto> {
     try {
@@ -63,6 +63,18 @@ export class AuthService {
     return {
       studentId: id, ...rest,
       token: this.getJwtToken({ studentId: student.id }),
+    };
+  }
+
+  async checkAuthStatus(studentId: number): Promise<AuthResponseDto> {
+    const student = await this.studentRepository.findOne({ where: { id: studentId } });
+    if (!student)
+      throw new UnauthorizedException('Student not found');
+    const { password: p, id, ...rest } = student;
+    return {
+      studentId: id,
+      ...rest,
+      token: this.getJwtToken({ studentId })
     };
   }
 

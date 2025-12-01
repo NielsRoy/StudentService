@@ -26,7 +26,7 @@ export class AppController {
 
   @MessagePattern('check_auth_status')
   check(@Payload('studentId', ParseIntPipe) studentId: number) {
-    return this.studentService.check(studentId);
+    return this.authService.checkAuthStatus(studentId);
   }
 
   @MessagePattern('get_subjects_to_enroll')
