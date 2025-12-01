@@ -11,6 +11,7 @@ import { AuthService } from './services/auth.service';
 import { StudentService } from './services/student.service';
 import { JwtModule } from '@nestjs/jwt';
 import { GradeService } from './services/grade.service';
+import { StudentHistoricService } from './services/student-historic.service';
 
 @Module({
   imports: [
@@ -60,6 +61,6 @@ import { GradeService } from './services/grade.service';
     CommonModule,
   ],
   controllers: [AppController],
-  providers: [AuthService, StudentService, GradeService],
+  providers: [AuthService, StudentService, GradeService, StudentHistoricService],
 })
 export class AppModule { }

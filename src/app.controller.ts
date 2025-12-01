@@ -4,12 +4,14 @@ import { CreateStudentRequestDto } from './dto/requests/create-student.request.d
 import { LoginStudentRequestDto } from './dto/requests/login-student.request.dto';
 import { AuthService } from './services/auth.service';
 import { StudentService } from './services/student.service';
+import { StudentHistoricService } from './services/student-historic.service';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly authService: AuthService,
     private readonly studentService: StudentService,
+    private readonly studentHistoricService: StudentHistoricService,
   ) { }
 
   @MessagePattern('register_student')
@@ -30,5 +32,10 @@ export class AppController {
   @MessagePattern('get_subjects_to_enroll')
   getSubjectsToEnroll(@Payload('studentId', ParseIntPipe) studentId: number) {
     return this.studentService.getSubjectsToEnroll(studentId);
+  }
+
+  @MessagePattern('get_student_historic')
+  getStudentHistoric(@Payload('studentId', ParseIntPipe) studentId: number) {
+    return this.studentHistoricService.getStudentHistoric(studentId);
   }
 }

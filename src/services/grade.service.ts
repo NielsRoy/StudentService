@@ -38,4 +38,34 @@ export class GradeService {
     async getPassedPrerequisiteIds(studentId: number): Promise<number[]> {
         return this.getApprovedPlanSubjectIds(studentId);
     }
+
+    /**
+     * Get complete grade history for a student with all related information
+     * @param studentId - The student ID
+     * @returns Array of grade records with subject, period, and term information, ordered by date (oldest first)
+     */
+    async getStudentGradeHistory(studentId: number): Promise<any[]> {
+        const results = await this.gradeRepository.createQueryBuilder("grade")
+            .innerJoin("enrollment_detail", "ed", `ed.id = grade."enrollmentDetailId"`)
+            .innerJoin("enrollment", "e", `e.id = ed."enrollmentId"`)
+            .innerJoin("period", "p", `p.id = e."periodId"`)
+            .innerJoin("term", "t", `t.id = p."termId"`)
+            .innerJoin("subject_group", "sg", `sg.id = ed."subjectGroupId"`)
+            .innerJoin("plan_subject", "ps", `ps.id = sg."planSubjectId"`)
+            .innerJoin("subject", "s", `s.id = ps."subjectId"`)
+            .select([
+                `ps."levelNumber" AS level`,
+                `s.code AS "subjectCode"`,
+                `s.name AS "subjectName"`,
+                `grade.number AS grade`,
+                `ps.credits AS credits`,
+                `p.number AS period`,
+                `t.year AS year`
+            ])
+            .where(`grade."studentId" = :studentId`, { studentId })
+            .orderBy("grade.date", "ASC")
+            .getRawMany();
+
+        return results;
+    }
 }
