@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { envs } from './config/env';
+import { env } from './config/env';
 import { Grade } from './entites/grade.entity';
 import { Student } from './entites/student.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -12,28 +12,29 @@ import { StudentService } from './services/student.service';
 import { JwtModule } from '@nestjs/jwt';
 import { GradeService } from './services/grade.service';
 import { StudentHistoricService } from './services/student-historic.service';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
     JwtModule.register({
-      secret: envs.JWT_SECRET,
+      secret: env.JWT_SECRET,
       signOptions: {
         expiresIn: '5h'
       },
     }),
     TypeOrmModule.forRoot({
-      ssl: envs.STATE === 'production',
+      ssl: env.STATE === 'production',
       extra: {
-        ssl: envs.STATE === 'production'
+        ssl: env.STATE === 'production'
           ? { rejectUnauthorized: false }
           : false
       },
       type: 'postgres',
-      host: envs.DB_HOST,
-      port: envs.DB_PORT,
-      username: envs.DB_USERNAME,
-      password: envs.DB_PASSWORD,
-      database: envs.DB_NAME,
+      host: env.DB_HOST,
+      port: env.DB_PORT,
+      username: env.DB_USERNAME,
+      password: env.DB_PASSWORD,
+      database: env.DB_NAME,
       autoLoadEntities: true,
     }),
     TypeOrmModule.forFeature([
@@ -45,22 +46,22 @@ import { StudentHistoricService } from './services/student-historic.service';
         name: NATS_SERVICE,
         transport: Transport.NATS,
         options: {
-          servers: [`nats://${envs.NATS_HOST}:${envs.NATS_PORT}`],
-        }
+          servers: [env.NATS_SERVER_URL],
+          authenticator: (env.STATE === 'production') 
+          ? {
+              type: 'jwt',
+              jwt: {
+                jwt: env.NATS_JWT,
+                seed: env.NATS_SEED,
+              },
+            }
+          : undefined,
+        },
       },
-      // { 
-      //   name: KAFKA_SERVICE,
-      //   transport: Transport.KAFKA,
-      //   options: {
-      //     client: {
-      //       brokers: [`${envs.kafkaHost}:${envs.kafkaPort}`],
-      //     },
-      //   },
-      // },
     ]),
     CommonModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [AuthService, StudentService, GradeService, StudentHistoricService],
 })
 export class AppModule { }

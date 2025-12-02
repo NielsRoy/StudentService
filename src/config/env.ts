@@ -16,9 +16,8 @@ interface EnvVars {
 
   NATS_HOST: string;
   NATS_PORT: number;
-
-  KAFKA_HOST: string;
-  KAFKA_PORT: number;
+  NATS_JWT: string;
+  NATS_SEED: string;
 }
 
 const envsSchema = joi.object({
@@ -34,10 +33,21 @@ const envsSchema = joi.object({
   DB_USERNAME: joi.string().required(),
 
   NATS_HOST: joi.string().required(),
-  NATS_PORT: joi.number().required(),
-
-  KAFKA_HOST: joi.string().required(),
-  KAFKA_PORT: joi.number().required(),
+  NATS_PORT: joi.number().when('STATE', {
+    is: 'development',
+    then: joi.required(),
+    otherwise: joi.optional(),    
+  }),
+   NATS_JWT: joi.string().when('STATE', {
+    is: 'production',
+    then: joi.required(),
+    otherwise: joi.optional().default(''),
+  }),
+  NATS_SEED: joi.string().when('STATE', {
+    is: 'production',
+    then: joi.required(),
+    otherwise: joi.optional().default(''),
+  }),
 })
 .unknown(true);
 
@@ -50,7 +60,7 @@ if ( error ) {
 const envVars:EnvVars = value;
 
 
-export const envs = {
+export const env = {
   STATE: envVars.STATE,
   PORT: envVars.PORT,
 
@@ -62,9 +72,9 @@ export const envs = {
   DB_PORT: envVars.DB_PORT,
   DB_USERNAME: envVars.DB_USERNAME,
 
-  NATS_HOST: envVars.NATS_HOST,
-  NATS_PORT: envVars.NATS_PORT,
-
-  KAFKA_HOST: envVars.KAFKA_HOST,
-  KAFKA_PORT: envVars.KAFKA_PORT,
+  NATS_SERVER_URL: (envVars.STATE === 'development') 
+    ? `nats://${envVars.NATS_HOST}:${envVars.NATS_PORT}`
+    : `tls://${envVars.NATS_HOST}`,
+  NATS_JWT: envVars.NATS_JWT,
+  NATS_SEED: envVars.NATS_SEED,
 };
