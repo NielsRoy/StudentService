@@ -14,10 +14,7 @@ interface EnvVars {
   DB_PORT: number;
   DB_USERNAME: string;
 
-  NATS_HOST: string;
-  NATS_PORT: number;
-  NATS_JWT: string;
-  NATS_SEED: string;
+  NATS_SERVER_URL: string;
 }
 
 const envsSchema = joi.object({
@@ -32,22 +29,7 @@ const envsSchema = joi.object({
   DB_PORT: joi.number().required(),
   DB_USERNAME: joi.string().required(),
 
-  NATS_HOST: joi.string().required(),
-  NATS_PORT: joi.number().when('STATE', {
-    is: 'development',
-    then: joi.required(),
-    otherwise: joi.optional(),    
-  }),
-   NATS_JWT: joi.string().when('STATE', {
-    is: 'production',
-    then: joi.required(),
-    otherwise: joi.optional().default(''),
-  }),
-  NATS_SEED: joi.string().when('STATE', {
-    is: 'production',
-    then: joi.required(),
-    otherwise: joi.optional().default(''),
-  }),
+  NATS_SERVER_URL: joi.string().required(),
 })
 .unknown(true);
 
@@ -72,9 +54,5 @@ export const env = {
   DB_PORT: envVars.DB_PORT,
   DB_USERNAME: envVars.DB_USERNAME,
 
-  NATS_SERVER_URL: (envVars.STATE === 'development') 
-    ? `nats://${envVars.NATS_HOST}:${envVars.NATS_PORT}`
-    : `tls://${envVars.NATS_HOST}`,
-  NATS_JWT: envVars.NATS_JWT,
-  NATS_SEED: envVars.NATS_SEED,
+  NATS_SERVER_URL: envVars.NATS_SERVER_URL,
 };
